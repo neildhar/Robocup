@@ -74,7 +74,7 @@ int compoundEye::readBulb(int bulb){
   i2cBus->endTransmission();
   i2cBus->requestFrom(I2C_Address,1);
   i2cBus->beginTransmission(I2C_Address);
-  i2cBus->write(bulb);
+  i2cBus->write(command);
   i2cBus->endTransmission();
   i2cBus->requestFrom(I2C_Address,1);
   while(!i2cBus->available()){}
