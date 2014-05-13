@@ -14,8 +14,6 @@ Motoren SWMotor(32,33,3,1);
 Motoren NEMotor(34,35,4);
 Motoren NWMotor(36,37,5,1);
 
-//This is some swaggy shizz.
-
 void setup() {
   Wire.begin();
   Wire1.begin();
