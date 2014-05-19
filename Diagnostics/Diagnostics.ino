@@ -3,6 +3,7 @@
 #include "JoinMaxSensors.h"
 #include <math.h>
 #include "SRF10.h"
+#include "CMPS10.h"
 JM::compoundEye front_CE(&Wire);
 JM::compoundEye back_CE(&Wire1);
 SRF10 right_US(&Wire,0xEA);

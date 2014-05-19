@@ -3,6 +3,7 @@
 #include "JoinMaxSensors.h"
 #include <math.h>
 #include "SRF10.h";
+#include "CMPS10.h"
 
 //Declare constants
 #define ambientIR 15
@@ -22,7 +23,7 @@ JM::compoundEye back_CE(&Wire1);
 SRF10 right_US(&Wire,0xEA);
 SRF10 left_US(&Wire, 0xEC);
 SRF10 back_US(&Wire1, 0xEE);
-JM::compassSensor compass(&Wire1);
+CMPS10 compass(&Wire1, 0xC0);
 
 //Declare Motors
 Motoren SEMotor(30,31,2);
