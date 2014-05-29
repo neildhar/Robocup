@@ -50,8 +50,8 @@ void setup() {
 }
 
 void loop() {
-  Wire.begin();
-  Wire1.begin();
+  //Wire.begin();
+  //Wire1.begin();
   //Compass Align
   compassValue = compass.read(); 
   CA_correction = compassValue!=0?(compassValue-CA_lastError)*CA_Kd+compassValue*CA_Kp:0;
