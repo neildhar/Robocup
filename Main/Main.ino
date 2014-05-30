@@ -75,26 +75,7 @@ void loop() {
       compassValue=compassValue+360;
     }
     
-    if(compassValue<=5||compassValue>=355){
-      //Advanced Breaking System
-      
-       if(((!CA_lastError-compassValue)<3)&&compassValue<180){
-         NEPower=SEPower=negNESE*2;
-         NWPower=SWPower=negNWSW*2;
-         VD_compound++;
-       }
-       else if((!(compassValue-CA_lastError)<3)&&compassValue>180){
-         NEPower=SEPower=negNESE*2;
-         NWPower=SWPower=negNWSW*2;
-         VD_compound++;
-       }
-       else{
-         NEPower=SEPower=NWPower=SWPower=0;
-       }       
-    }
-    
-    else{
-      if(compassValue<180){
+    if(compassValue<180){
       CA_correction=(compassValue-CA_lastError)*CA_Kd+compassValue*CA_Kp;
       CA_lastError=compassValue;
       NEPower=SEPower=(CA_correction/8)+4;
@@ -103,15 +84,14 @@ void loop() {
       negNWSW=-NWPower;  
       VD_compound++;    
     }
-      else{
-        CA_correction=((360-compassValue)-CA_lastError)*CA_Kd+(360-compassValue)*CA_Kp;
-        CA_lastError=(360-compassValue);
-        NEPower=SEPower=(CA_correction/8)*(-1)-4;
-        NWPower=SWPower=(CA_correction/(8))+4;
-        negNESE=-NEPower;
-        negNWSW=-NWPower;
-        VD_compound++;
-      }
+    else{
+      CA_correction=((360-compassValue)-CA_lastError)*CA_Kd+(360-compassValue)*CA_Kp;
+      CA_lastError=(360-compassValue);
+      NEPower=SEPower=(CA_correction/8)*(-1)-4;
+      NWPower=SWPower=(CA_correction/(8))+4;
+      negNESE=-NEPower;
+      negNWSW=-NWPower;
+      VD_compound++;
     }
  
   xPos = left_US.read();
