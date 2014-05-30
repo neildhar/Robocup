@@ -16,6 +16,7 @@
       int range;
       int USRange;
       unsigned long long lastRangeTime;
+      short temp;
     public:
       SRF10(TwoWire*, byte);
       int read();

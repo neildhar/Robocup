@@ -9,7 +9,7 @@
 
 SRF10::SRF10(TwoWire * _bus, byte Addr): i2cBus(_bus) {
 	I2C_Address = Addr >> 1;
-        USRange=65;
+        USRange=70;
 }
 
 int SRF10::read(){
@@ -21,7 +21,8 @@ int SRF10::read(){
 	while(i2cBus->available() < 2); 
   	byte high = i2cBus->read();
   	byte low = i2cBus->read();
-  	range = (high << 8) + low;
+        temp=(high << 8) + low;
+  	range = temp>0?temp:range;
      
   	//initiate a new ranging
 	i2cBus->beginTransmission(I2C_Address);
@@ -83,6 +84,6 @@ void SRF10::setRange(double newRange){
   i2cBus->write(byte(0x02));
   i2cBus->write(rangeNo);
   i2cBus->endTransmission();
-  USRange = (double)(0.254901961*rangeNo);
+  USRange = (double)(0.3*rangeNo);
 }
 
