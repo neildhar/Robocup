@@ -21,7 +21,7 @@ int CMPS10::read(){
   i2cBus->write(byte(0x02));                              //Sends the register we wish to start reading from
   i2cBus->endTransmission();
 
-  i2cBus->requestFrom(I2C_Address, 4);              // Request 4 bytes from CMPS10
+  i2cBus->requestFrom(I2C_Address, byte(4));              // Request 4 bytes from CMPS10
   highByte = i2cBus->read();           
   lowByte = i2cBus->read();
   i2cBus->read();
@@ -36,7 +36,7 @@ int CMPS10::magRead(){
   i2cBus->write(byte(10));                              
   i2cBus->endTransmission();
   
-  i2cBus->requestFrom(I2C_Address, 4);
+  i2cBus->requestFrom(I2C_Address, byte(4));
   xMagHighByte = i2cBus->read();           
   xMagLowByte = i2cBus->read();
   yMagHighByte = i2cBus->read();           
@@ -66,7 +66,7 @@ int CMPS10::readMagAxis(char axis){
   i2cBus->write(byte(10));                              
   i2cBus->endTransmission();
   
-  i2cBus->requestFrom(I2C_Address, 4);
+  i2cBus->requestFrom(I2C_Address, byte(4));
   xMagHighByte = i2cBus->read();           
   xMagLowByte = i2cBus->read();
   yMagHighByte = i2cBus->read();           
@@ -141,11 +141,16 @@ void CMPS10::calibrate(){
 }
 
 void CMPS10::factoryReset(){
+    Serial.println("Are you sure you want to factory reset? (y/n):");
     while(!Serial.available());
-    while(charRead!='a'){
+    while(charRead!='y'){
       delay(1);
       byteRead=Serial.read();
       charRead = char(byteRead);
+      if(charRead='n'){
+        Serial.println("Aborting...");
+        return;
+      }
     }
     i2cBus->beginTransmission(I2C_Address);
     i2cBus->write(byte(22));
