@@ -40,7 +40,7 @@ SRF10 left_US(&Wire1, 0xEC);
 SRF10 back_US(&Wire, 0xEE);
 
 //Declare CMPS10 Compass
-CMPS10 compass(&Wire, 0xC0, compassXOffset, compassXScale, compassYOffset, compassYScale);
+CMPS10 compass(&Wire1, 0xC0, compassXOffset, compassXScale, compassYOffset, compassYScale);
 
 //Declare Motors
 Motoren SEMotor(30,31,2);
@@ -78,6 +78,7 @@ void loop() {
     //Start of Compass Align
     compassValue=compass.magRead();
     compassValue=compassValue-trueMagVal;
+    Serial.println(compassValue);
     if(compassValue<0){
       compassValue=compassValue+360;
     }

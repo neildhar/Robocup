@@ -21,11 +21,11 @@
 #define kAOG 180
 
 JM::compoundEye back_CE(&Wire1);
-JM::compoundEye front_CE(&Wire);
+JM::compoundEye front_CE(&Wire);s
 SRF10 right_US(&Wire1, 0xEA);
 SRF10 left_US(&Wire1, 0xEC);
 SRF10 back_US(&Wire, 0xEE);
-CMPS10 compass(&Wire, 0xC0, compassXOffset, compassXScale, compassYOffset, compassYScale);
+CMPS10 compass(&Wire1, 0xC0, compassXOffset, compassXScale, compassYOffset, compassYScale);
 //JM::compassSensor compass(&Wire1);
 Motoren SEMotor(30,31,2);
 Motoren SWMotor(32,33,3,1);
@@ -65,6 +65,7 @@ void loop() {
   trueMagVal=189;
   compassValue=compass.magRead();
   compassValue=compassValue-trueMagVal;
+  Serial.println(compassValue);
   if(compassValue<0){
     compassValue=compassValue+360;
   }
