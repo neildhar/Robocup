@@ -1,6 +1,5 @@
 /*
   SRF10.h - Library for using SRF10 Rangefinders with Arduino
-  Adapted for current purposes by Swaggy Master Sai Suman.
 */
 
 #ifndef CMPS10_h
