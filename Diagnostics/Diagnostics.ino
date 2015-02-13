@@ -30,14 +30,14 @@ CMPS10 compass(&Wire1, 0xC0, compassXOffset, compassXScale, compassYOffset, comp
 Motoren SEMotor(30,31,2);
 Motoren SWMotor(32,33,3,1);
 Motoren NWMotor(34,35,4,1);
-Motoren NEMotor(36,37,5);
+Motoren NEMotor(36,37,7); //5,6 are not used as there is interference from the internal clock
 
 //Declare Variables
 byte byteRead;
 char charRead;
 int compassValue, NEPower, SEPower, NWPower, SWPower, cspd, CA_correction, CA_lastError, VD_compound, ccount, negNESE, negNWSW;
 int trueMagVal, counter, BT_ballPos, BT_ballDist, BT_dirMod, BT_clockPort, BT_anticlockPort, BT_bulb;
-int xPos, yPos, fIRValue, bIRValue, VD_bearing, compSpeed;
+int xPos, yPos, fIRValue, bIRValue=0, VD_bearing, compSpeed;
 const double CA_Kp=double(300/180), BT_aimKp = 90/195;
 double VD_multiplier,VD_speed, VD_motorPowerScaler;
 bool leftZone, centreZone;
@@ -62,7 +62,7 @@ void loop() {
     //Start of Compass Align
     compassValue=compass.magRead();
     compassValue=compassValue-trueMagVal;
-    Serial.println(compassValue);
+
     if(compassValue<0){
       compassValue=compassValue+360;
     }
@@ -75,8 +75,8 @@ void loop() {
       if(compassValue<180){
       CA_correction=(compassValue-CA_lastError)*CA_Kd+compassValue*CA_Kp;
       CA_lastError=compassValue;
-      NEPower=SEPower=(CA_correction/8)+4;
-      NWPower=SWPower=(CA_correction/8*(-1))-4;
+      NEPower=SEPower=(CA_correction/5)+4;
+      NWPower=SWPower=(CA_correction/5*(-1))-4;
       negNESE=-NEPower;
       negNWSW=-NWPower;  
       VD_compound++;    
@@ -95,14 +95,14 @@ void loop() {
   xPos = left_US.read();
   yPos = xPos<rAimzone||xPos>lAimzone?back_US.read()+20:back_US.read();
   fIRValue=front_CE.highestValue();
-  bIRValue=back_CE.highestValue();
+  //bIRValue=back_CE.highestValue();
 
   if(fIRValue>ambientIR||bIRValue>ambientIR){ //Check if ball is on field
     //Start of Ball Tracking
-    VD_speed=0.2;
+    VD_speed=0.6;
     if(fIRValue>bIRValue){
       BT_bulb = front_CE.highestBulb();
-      BT_ballDist = fIRValue;
+      BT_ballDist = fIRValue; 
       BT_ballPos = 240+(30*BT_bulb);
       BT_clockPort = BT_bulb!=7?front_CE.readBulb(BT_bulb+1):back_CE.readBulb(1);
       BT_anticlockPort = BT_bulb!=1?front_CE.readBulb(BT_bulb-1):back_CE.readBulb(7);  
@@ -115,6 +115,7 @@ void loop() {
       BT_anticlockPort = BT_bulb!=1?back_CE.readBulb(BT_bulb-1):front_CE.readBulb(7);  
     }
     BT_ballPos = (((BT_clockPort-BT_anticlockPort)/6)+BT_ballPos)%360; //Determine Ball Position
+    Serial.println(BT_ballPos);
     
     if ( BT_ballPos<=90 ) BT_dirMod=BT_ballPos;
     else if(BT_ballPos>=270) BT_dirMod=360-BT_ballPos;
@@ -125,10 +126,12 @@ void loop() {
     else VD_bearing=BT_ballPos;
     
     if ( (BT_ballPos>345||BT_ballPos<15) && BT_ballDist==145){
-      if (xPos<lAimzone) VD_bearing=yPos*BT_aimKp;
+      /*if (xPos<lAimzone) VD_bearing=yPos*BT_aimKp;
       else if (xPos>rAimzone) VD_bearing=360-(yPos*BT_aimKp);
-      else VD_bearing=0;
+      else VD_bearing=0;*/
+      VD_bearing=0;
     }
+    //Serial.println(VD_bearing);
   }
   
   else{
