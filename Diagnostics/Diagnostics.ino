@@ -16,9 +16,10 @@
 #define lAimzone 45
 #define rAimzone 118
 #define MPS 1
-#define CA_Kd 5
+#define CA_Kd 0
 #define BA_Kp 0.71
 #define kAOG 180
+#define CA_Offset 182
 
 JM::compoundEye back_CE(&Wire1);
 JM::compoundEye front_CE(&Wire);
@@ -35,13 +36,12 @@ Motoren NEMotor(36,37,7); //5,6 are not used as there is interference from the i
 //Declare Variables
 byte byteRead;
 char charRead;
-int compassValue, NEPower, SEPower, NWPower, SWPower, cspd, CA_correction, CA_lastError, VD_compound, ccount, negNESE, negNWSW;
-int trueMagVal, counter, BT_ballPos, BT_ballDist, BT_dirMod, BT_clockPort, BT_anticlockPort, BT_bulb;
-int xPos, yPos, fIRValue, bIRValue=0, VD_bearing, compSpeed;
-const double CA_Kp=double(300/180), BT_aimKp = 90/195;
+int compassValue, NEPower, SEPower, NWPower, SWPower, cspd, CA_correction, CA_lastError, VD_compound=0, CA_speed;
+int trueMagVal=189, counter, BT_ballPos, BT_ballDist, BT_dirMod, BT_clockPort, BT_anticlockPort, BT_bulb;
+int xPos, yPos, BT_fIRValue, BT_bIRValue, VD_bearing;
+const double CA_Kp=double(200/180), BT_aimKp = 90/195;
 double VD_multiplier,VD_speed, VD_motorPowerScaler;
 bool leftZone, centreZone;
-int APESHIT_mod, APESHIT_mod_N, APESHIT_mod_S, apeshitNE, apeshitNW, apeshitSE, apeshitSW;
 
 int VectorDynamics[361][2]={{255,255},{255,246},{255,238},{255,230},{255,222},{255,214},{255,206},{255,199},{255,192},{255,185},{255,179},{255,172},{255,166},{255,159},{255,153},{255,147},{255,141},{255,136},{255,130},{255,124},{255,119},{255,114},{255,108},{255,103},{255,98},{255,93},{255,88},{255,83},{255,78},{255,73},{255,68},{255,64},{255,59},{255,54},{255,50},{255,45},{255,40},{255,36},{255,31},{255,27},{255,22},{255,18},{255,13},{255,9},{255,4},{255,0},{255,-4},{255,-9},{255,-13},{255,-18},{255,-22},{255,-27},{255,-31},{255,-36},{255,-40},{255,-45},{255,-50},{255,-54},{255,-59},{255,-64},{255,-68},{255,-73},{255,-78},{255,-83},{255,-88},{255,-93},{255,-98},{255,-103},{255,-108},{255,-114},{255,-119},{255,-124},{255,-130},{255,-136},{255,-141},{255,-147},{255,-153},{255,-159},{255,-166},{255,-172},{255,-179},{255,-185},{255,-192},{255,-199},{255,-206},{255,-214},{255,-222},{255,-230},{255,-238},{255,-246},{255,-255},{246,-255},{238,-255},{230,-255},{222,-255},{214,-255},{206,-255},{199,-255},{192,-255},{185,-255},{179,-255},{172,-255},{166,-255},{159,-255},{153,-255},{147,-255},{141,-255},{136,-255},{130,-255},{124,-255},{119,-255},{114,-255},{108,-255},{103,-255},{98,-255},{93,-255},{88,-255},{83,-255},{78,-255},{73,-255},{68,-255},{64,-255},{59,-255},{54,-255},{50,-255},{45,-255},{40,-255},{36,-255},{31,-255},{27,-255},{22,-255},{18,-255},{13,-255},{9,-255},{4,-255},{0,-255},{-4,-255},{-9,-255},{-13,-255},{-18,-255},{-22,-255},{-27,-255},{-31,-255},{-36,-255},{-40,-255},{-45,-255},{-50,-255},{-54,-255},{-59,-255},{-64,-255},{-68,-255},{-73,-255},{-78,-255},{-83,-255},{-88,-255},{-93,-255},{-98,-255},{-103,-255},{-108,-255},{-114,-255},{-119,-255},{-124,-255},{-130,-255},{-136,-255},{-141,-255},{-147,-255},{-153,-255},{-159,-255},{-166,-255},{-172,-255},{-179,-255},{-185,-255},{-192,-255},{-199,-255},{-206,-255},{-214,-255},{-222,-255},{-230,-255},{-238,-255},{-246,-255},{-255,-255},{-255,-246},{-255,-238},{-255,-230},{-255,-222},{-255,-214},{-255,-206},{-255,-199},{-255,-192},{-255,-185},{-255,-179},{-255,-172},{-255,-166},{-255,-159},{-255,-153},{-255,-147},{-255,-141},{-255,-136},{-255,-130},{-255,-124},{-255,-119},{-255,-114},{-255,-108},{-255,-103},{-255,-98},{-255,-93},{-255,-88},{-255,-83},{-255,-78},{-255,-73},{-255,-68},{-255,-64},{-255,-59},{-255,-54},{-255,-50},{-255,-45},{-255,-40},{-255,-36},{-255,-31},{-255,-27},{-255,-22},{-255,-18},{-255,-13},{-255,-9},{-255,-4},{-255,0},{-255,4},{-255,9},{-255,13},{-255,18},{-255,22},{-255,27},{-255,31},{-255,36},{-255,40},{-255,45},{-255,50},{-255,54},{-255,59},{-255,64},{-255,68},{-255,73},{-255,78},{-255,83},{-255,88},{-255,93},{-255,98},{-255,103},{-255,108},{-255,114},{-255,119},{-255,124},{-255,130},{-255,136},{-255,141},{-255,147},{-255,153},{-255,159},{-255,166},{-255,172},{-255,179},{-255,185},{-255,192},{-255,199},{-255,206},{-255,214},{-255,222},{-255,230},{-255,238},{-255,246},{-255,255},{-246,255},{-238,255},{-230,255},{-222,255},{-214,255},{-206,255},{-199,255},{-192,255},{-185,255},{-179,255},{-172,255},{-166,255},{-159,255},{-153,255},{-147,255},{-141,255},{-136,255},{-130,255},{-124,255},{-119,255},{-114,255},{-108,255},{-103,255},{-98,255},{-93,255},{-88,255},{-83,255},{-78,255},{-73,255},{-68,255},{-64,255},{-59,255},{-54,255},{-50,255},{-45,255},{-40,255},{-36,255},{-31,255},{-27,255},{-22,255},{-18,255},{-13,255},{-9,255},{-4,255},{0,255},{4,255},{9,255},{13,255},{18,255},{22,255},{27,255},{31,255},{36,255},{40,255},{45,255},{50,255},{54,255},{59,255},{64,255},{68,255},{73,255},{78,255},{83,255},{88,255},{93,255},{98,255},{103,255},{108,255},{114,255},{119,255},{124,255},{130,255},{136,255},{141,255},{147,255},{153,255},{159,255},{166,255},{172,255},{179,255},{185,255},{192,255},{199,255},{206,255},{214,255},{222,255},{230,255},{238,255},{246,255},{255,255}};
 
@@ -59,63 +59,49 @@ void setup() {
 }
 
 void loop() {
+    VD_compound=0;
     //Start of Compass Align
     compassValue=compass.magRead();
-    compassValue=compassValue-trueMagVal;
+    
+    compassValue=compassValue-CA_Offset;
+    
 
     if(compassValue<0){
       compassValue=compassValue+360;
     }
-    
-    if(compassValue<=2||compassValue>=358){
-         NEPower=SEPower=NWPower=SWPower=0;
-    }
-    
-    else{
-      if(compassValue<180){
-      CA_correction=(compassValue-CA_lastError)*CA_Kd+compassValue*CA_Kp;
-      CA_lastError=compassValue;
-      NEPower=SEPower=(CA_correction/5)+4;
-      NWPower=SWPower=(CA_correction/5*(-1))-4;
-      negNESE=-NEPower;
-      negNWSW=-NWPower;  
-      VD_compound++;    
-    }
-      else{
-        CA_correction=((360-compassValue)-CA_lastError)*CA_Kd+(360-compassValue)*CA_Kp;
-        CA_lastError=(360-compassValue);
-        NEPower=SEPower=((CA_correction/8)*(-1)-4);
-        NWPower=SWPower=(CA_correction/8)+4;
-        negNESE=-NEPower;
-        negNWSW=-NWPower;
-        VD_compound++;
-      }
-    }
+    Serial.println(compassValue);
+    if(compassValue<=2||compassValue>=358) NEPower=SEPower=NWPower=SWPower=0;
+    else if (compassValue>180) CA_speed = -(CA_Kp)*(360-compassValue);
+    else CA_speed = (CA_Kp)*compassValue;
+    NEPower = SEPower = CA_speed;
+    NWPower = SWPower = -CA_speed;
+    VD_compound++;
  
-  xPos = left_US.read();
-  yPos = xPos<rAimzone||xPos>lAimzone?back_US.read()+20:back_US.read();
-  fIRValue=front_CE.highestValue();
-  //bIRValue=back_CE.highestValue();
+  //xPos = left_US.read();
+  back_US.read();
+  //yPos = xPos<rAimzone||xPos>lAimzone?back_US.read()+20:back_US.read();
+  BT_fIRValue=front_CE.highestValue();
+  BT_bIRValue=0;//back_CE.highestValue();
 
-  if(fIRValue>ambientIR||bIRValue>ambientIR){ //Check if ball is on field
+  if(BT_fIRValue>ambientIR||BT_bIRValue>ambientIR){ //Check if ball is on field
     //Start of Ball Tracking
     VD_speed=0.6;
-    if(fIRValue>bIRValue){
+    if(BT_fIRValue>BT_bIRValue){
       BT_bulb = front_CE.highestBulb();
-      BT_ballDist = fIRValue; 
+      BT_ballDist = BT_fIRValue; 
       BT_ballPos = 240+(30*BT_bulb);
       BT_clockPort = BT_bulb!=7?front_CE.readBulb(BT_bulb+1):back_CE.readBulb(1);
       BT_anticlockPort = BT_bulb!=1?front_CE.readBulb(BT_bulb-1):back_CE.readBulb(7);  
     }
     else{
       BT_bulb = back_CE.highestBulb();
-      BT_ballDist = bIRValue;
+      BT_ballDist = BT_bIRValue;
       BT_ballPos = 60+(30*BT_bulb);
       BT_clockPort = BT_bulb!=7?back_CE.readBulb(BT_bulb+1):front_CE.readBulb(1);
       BT_anticlockPort = BT_bulb!=1?back_CE.readBulb(BT_bulb-1):front_CE.readBulb(7);  
     }
     BT_ballPos = (((BT_clockPort-BT_anticlockPort)/6)+BT_ballPos)%360; //Determine Ball Position
-    Serial.println(BT_ballPos);
+    //Serial.println(BT_ballPos);
     
     if ( BT_ballPos<=90 ) BT_dirMod=BT_ballPos;
     else if(BT_ballPos>=270) BT_dirMod=360-BT_ballPos;
@@ -135,7 +121,6 @@ void loop() {
   }
   
   else{
-    VD_compound--;
     //Base Align
     /*if(yPos>60||yPos<50){
       if(yPos>55){
@@ -165,71 +150,18 @@ void loop() {
     
   }
   //Compute vector
-  
   VD_compound++;
   NEPower=((NEPower+(VectorDynamics[VD_bearing][1]*VD_speed))/VD_compound);
   SEPower=((SEPower+(VectorDynamics[VD_bearing][0]*VD_speed))/VD_compound);
   SWPower=((SWPower+(VectorDynamics[VD_bearing][1]*VD_speed))/VD_compound);
   NWPower=((NWPower+(VectorDynamics[VD_bearing][0]*VD_speed))/VD_compound);
   
-  //Compute and set motor powers
-  
+  //Set motor powers
   NEMotor.setPower(NEPower);
   SEMotor.setPower(SEPower);
   SWMotor.setPower(SWPower);
   NWMotor.setPower(NWPower);
-  VD_compound=0;
 }
 
-/*
-void setup() {
-  Wire.begin();
-  Wire1.begin();
-  Serial.begin(9600);
-  left_US.setGain(0x05);
-  left_US.setRange(4);
-  //right_US.setGain(0x05);
-  //right_US.setRange(4);
-  back_US.setGain(0x05);
-  back_US.setRange(4);
-  
-}
-
-//CMSPS10 Calibration
-
-void loop() {
-  trueMagVal=189;
-  compassValue=compass.magRead();
-  compassValue=compassValue-trueMagVal;
-  if(compassValue<0){
-    compassValue=compassValue+360;
-  }
-    
-  if(compassValue<180){
-    CA_correction=(compassValue-CA_lastError)*CA_Kd+compassValue*CA_Kp;
-    CA_lastError=compassValue;
-    NEPower=SEPower=(CA_correction/8)+4;
-    NWPower=SWPower=(CA_correction*(-1)/(8))-4;
-  
-    VD_compound++;
-  }
-  else{
-    CA_correction=((360-compassValue)-CA_lastError)*CA_Kd+(360-compassValue)*CA_Kp;
-    CA_lastError=(360-compassValue);
-    NEPower=SEPower=(CA_correction/8)*(-1)-4;
-    NWPower=SWPower=(CA_correction/(8))+4;
-    VD_compound++;
-  }
-    NEMotor.setPower(NEPower);
-    SEMotor.setPower(SEPower);
-    SWMotor.setPower(SWPower);
-    NWMotor.setPower(NWPower);
-    VD_compound=0;
-    
-    fIRValue=front_CE.highestValue();
-    bIRValue=back_CE.highestValue();
-    Serial.println(fIRValue);
-}
-*/
 
 

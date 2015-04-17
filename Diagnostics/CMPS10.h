@@ -20,6 +20,7 @@
       byte xMagHighByte, xMagLowByte, yMagHighByte, yMagLowByte;
       int xOffset, xScale;
       int yOffset, yScale;
+      unsigned long long lastMagReadTime;
     public:
       CMPS10(TwoWire*, byte);
       CMPS10(TwoWire*, byte, int, int, int, int);

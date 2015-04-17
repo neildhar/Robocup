@@ -31,7 +31,7 @@ int compassSensor::read(){
   char high = i2cBus->read();
   unsigned char low = i2cBus->read();
   int result = (int)(high*256+low);
-  return result<181?result:result-360;
+  return result;//result<181?result:result-360;
 }
 
 

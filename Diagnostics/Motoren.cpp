@@ -27,9 +27,9 @@ boolean Motoren::setPower(int Power){
   	return 1;
   }
   else{
-  	analogWrite(PWMPin, -Power);
-  	digitalWrite(INAPin, flip);
-  	digitalWrite(INBPin, 1-flip);
-  return 1;
+    analogWrite(PWMPin, -Power);
+    digitalWrite(INAPin, flip);
+    digitalWrite(INBPin, 1-flip);
+    return 1;
   }
 }

@@ -32,32 +32,35 @@ int CMPS10::read(){
 }
 
 int CMPS10::magRead(){
-  i2cBus->beginTransmission(I2C_Address);           
-  i2cBus->write(byte(10));                              
-  i2cBus->endTransmission();
-  
-  i2cBus->requestFrom(I2C_Address, 4);
-  xMagHighByte = i2cBus->read();           
-  xMagLowByte = i2cBus->read();
-  yMagHighByte = i2cBus->read();           
-  yMagLowByte = i2cBus->read();
-  
-  xMag = short(xMagHighByte<<8);
-  xMag |= xMagLowByte;
-  yMag = short(yMagHighByte<<8);
-  yMag |= yMagLowByte;
-  
-  realXMag = double(double(xMag+xOffset)/xScale);
-  realYMag = double(double(yMag+yOffset)/yScale);
-  
-  if(realYMag!=0){
-    magBearing = (atan2(realXMag,realYMag)*180.0)/3.141592654;
+  if(millis()-lastMagReadTime>15){
+    i2cBus->beginTransmission(I2C_Address);           
+    i2cBus->write(byte(10));                              
+    i2cBus->endTransmission();
+    
+    i2cBus->requestFrom(I2C_Address, 4);
+    xMagHighByte = i2cBus->read();           
+    xMagLowByte = i2cBus->read();
+    yMagHighByte = i2cBus->read();           
+    yMagLowByte = i2cBus->read();
+    
+    xMag = short(xMagHighByte<<8);
+    xMag |= xMagLowByte;
+    yMag = short(yMagHighByte<<8);
+    yMag |= yMagLowByte;
+    
+    realXMag = double(double(xMag+xOffset)/xScale);
+    realYMag = double(double(yMag+yOffset)/yScale);
+    
+    if(realYMag!=0){
+      magBearing = (atan2(realXMag,realYMag)*180.0)/3.141592654;
+    }
+    else if(realXMag>0) magBearing=0.0;
+    else if(realYMag<0) magBearing=180.0;
+    else magBearing = 1000;
+    if(magBearing < 0) magBearing+=360;
+    magBearing=360-magBearing;
+    lastMagReadTime=millis();
   }
-  else if(realXMag>0) magBearing=0.0;
-  else if(realYMag<0) magBearing=180.0;
-  else magBearing = 1000;
-  if(magBearing < 0) magBearing+=360;
-  magBearing=360-magBearing;
   return magBearing;
 }
 

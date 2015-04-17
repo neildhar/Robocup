@@ -23,7 +23,7 @@ namespace JM{
   class compassSensor{
     private: 
       TwoWire * i2cBus;
-      static const int I2C_Address = 0x3B;
+      static const int I2C_Address = 59;
     public:
       compassSensor(TwoWire*);
       int read();
