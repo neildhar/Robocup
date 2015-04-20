@@ -5,18 +5,18 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <math.h>
-#include "CMPS10.h";
+#include "CMPS10_I2C.h";
 
 
-CMPS10::CMPS10(TwoWire * _bus, byte Addr): i2cBus(_bus) {
+CMPS10_I2C::CMPS10_I2C(TwoWire * _bus, byte Addr): i2cBus(_bus) {
   I2C_Address = Addr >> 1;
 }
 
-CMPS10::CMPS10(TwoWire * _bus, byte Addr, int _xOffset, int _xScale, int _yOffset, int _yScale): i2cBus(_bus), xOffset(_xOffset), xScale(_xScale), yOffset(_yOffset), yScale(_yScale) {
+CMPS10_I2C::CMPS10_I2C(TwoWire * _bus, byte Addr, int _xOffset, int _xScale, int _yOffset, int _yScale): i2cBus(_bus), xOffset(_xOffset), xScale(_xScale), yOffset(_yOffset), yScale(_yScale) {
   I2C_Address = Addr >> 1;
 }
 
-int CMPS10::read(){
+int CMPS10_I2C::read(){
   i2cBus->beginTransmission(I2C_Address);           //starts communication with CMPS10
   i2cBus->write(byte(0x02));                              //Sends the register we wish to start reading from
   i2cBus->endTransmission();
@@ -31,7 +31,7 @@ int CMPS10::read(){
   return bearing;
 }
 
-int CMPS10::magRead(){
+int CMPS10_I2C::magRead(){
   if(millis()-lastMagReadTime>15){
     i2cBus->beginTransmission(I2C_Address);           
     i2cBus->write(byte(10));                              
@@ -64,7 +64,7 @@ int CMPS10::magRead(){
   return magBearing;
 }
 
-int CMPS10::readMagAxis(char axis){
+int CMPS10_I2C::readMagAxis(char axis){
   i2cBus->beginTransmission(I2C_Address);           
   i2cBus->write(byte(10));                              
   i2cBus->endTransmission();
@@ -85,7 +85,7 @@ int CMPS10::readMagAxis(char axis){
   else return 0;
 }
 
-void CMPS10::calibrate(){
+void CMPS10_I2C::calibrate(){
   while(!Serial.available());
     byteRead=Serial.read();
     charRead = char(byteRead);
@@ -143,7 +143,7 @@ void CMPS10::calibrate(){
     Serial.println("Calibration Terminated"); 
 }
 
-void CMPS10::factoryReset(){
+void CMPS10_I2C::factoryReset(){
     while(!Serial.available());
     while(charRead!='a'){
       delay(1);

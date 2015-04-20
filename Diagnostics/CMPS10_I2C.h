@@ -1,13 +1,13 @@
 /*
-  SRF10.h - Library for using SRF10 Rangefinders with Arduino
+  CMPS10_I2C.h - Library for using CMPS10 Compass with Arduino over I2C
 */
 
-#ifndef CMPS10_h
-#define CMPS10_h
+#ifndef CMPS10_I2C_h
+#define CMPS10_I2C_h
 
 #include <Arduino.h>
 
-  class CMPS10{
+  class CMPS10_I2C{
     private: 
       TwoWire * i2cBus;
       byte I2C_Address, byteRead;
@@ -22,8 +22,8 @@
       int yOffset, yScale;
       unsigned long long lastMagReadTime;
     public:
-      CMPS10(TwoWire*, byte);
-      CMPS10(TwoWire*, byte, int, int, int, int);
+      CMPS10_I2C(TwoWire*, byte);
+      CMPS10_I2C(TwoWire*, byte, int, int, int, int);
       int read();
       int magRead();
       void calibrate();

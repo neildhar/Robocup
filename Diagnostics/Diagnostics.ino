@@ -3,7 +3,8 @@
 #include "JoinMaxSensors.h"
 #include <math.h>
 #include "SRF10.h"
-#include "CMPS10.h"
+#include "CMPS10_I2C.h"
+#include "CMPS10_Serial.h"
 
 #define compassYOffset 155
 #define compassYScale 355
@@ -26,7 +27,7 @@ JM::compoundEye front_CE(&Wire);
 SRF10 right_US(&Wire1, 0xEA);
 SRF10 left_US(&Wire1, 0xEC);
 SRF10 back_US(&Wire, 0xEE);
-CMPS10 compass(&Wire1, 0xC0, compassXOffset, compassXScale, compassYOffset, compassYScale);
+CMPS10_I2C compass(&Wire1, 0xC0, compassXOffset, compassXScale, compassYOffset, compassYScale);
 //JM::compassSensor compass(&Wire1);
 Motoren SEMotor(30,31,2);
 Motoren SWMotor(32,33,3,1);
