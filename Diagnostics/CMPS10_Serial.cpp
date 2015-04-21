@@ -6,9 +6,31 @@
 #include <math.h>
 #include "CMPS10_Serial.h";
 
-CMPS10_Serial::CMPS10_Serial(Stream * _bus): serialBus(_bus) {}
+CMPS10_Serial::CMPS10_Serial(HardwareSerial * _bus): serialBus(_bus) {}
 
-CMPS10_Serial::CMPS10_Serial(Stream * _bus, int _xOffset, int _xScale, int _yOffset, int _yScale): serialBus(_bus), xOffset(_xOffset), xScale(_xScale), yOffset(_yOffset), yScale(_yScale) {}
+CMPS10_Serial::CMPS10_Serial(HardwareSerial * _bus, int _xOffset, int _xScale, int _yOffset, int _yScale): serialBus(_bus), xOffset(_xOffset), xScale(_xScale), yOffset(_yOffset), yScale(_yScale) {}
+
+void CMPS10_Serial::init(int baudRate){
+  serialBus->begin(9600);
+  delayMicroseconds(1000);
+  serialBus->write(0xA1);
+  delayMicroseconds(1000);
+  serialBus->end();
+  serialBus->begin(baudRate);
+  delayMicroseconds(1000);
+  serialBus->read();
+  /*
+  Serial1.begin(9600);
+  //highbaud
+  //delayMicroseconds(2);
+  Serial1.write(0xA1);
+  //delayMicroseconds(2);
+  Serial1.end();
+  Serial1.begin(38400);
+  //delayMicroseconds(2);
+  Serial1.read();
+  */
+}
 
 //Basic Tilt-compensated 2 byte read
 int CMPS10_Serial::read(){
@@ -30,7 +52,10 @@ int CMPS10_Serial::magRead(){
     serialBus->write(byte(0x21));
     
     //Wait for Serial Buffer
-    while(serialBus->available()<6) delayMicroseconds(1);    
+    while(serialBus->available()<6){
+      delayMicroseconds(1);    
+      Serial.println("Waiting");
+    }
 
     xMagHighByte = serialBus->read();//high x           
     xMagLowByte = serialBus->read();//low x

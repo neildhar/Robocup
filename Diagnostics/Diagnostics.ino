@@ -56,7 +56,7 @@ void setup() {
   Wire.begin();
   Wire1.begin();
   Serial.begin(9600);
-  Serial1.begin(9600);
+  compass.init(38400); // init function begins serial as well
   left_US.setGain(0x05);
   left_US.setRange(4);
   //right_US.setGain(0x05);

@@ -9,7 +9,7 @@
 
   class CMPS10_Serial{
     private: 
-      Stream * serialBus;
+      HardwareSerial * serialBus;
       byte byteRead;
       char charRead;
       unsigned int bearing;
@@ -22,8 +22,9 @@
       int yOffset, yScale;
       unsigned long long lastMagReadTime;
     public:
-      CMPS10_Serial(Stream*);
-      CMPS10_Serial(Stream*, int, int, int, int);
+      CMPS10_Serial(HardwareSerial*);
+      CMPS10_Serial(HardwareSerial*, int, int, int, int);
+      void init(int);
       int read();
       int magRead();
       void calibrate();
