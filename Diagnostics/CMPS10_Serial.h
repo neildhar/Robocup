@@ -20,13 +20,14 @@
       byte xMagHighByte, xMagLowByte, yMagHighByte, yMagLowByte;
       int xOffset, xScale;
       int yOffset, yScale;
+      bool sentReq;
       unsigned long long lastMagReadTime;
     public:
       CMPS10_Serial(HardwareSerial*);
       CMPS10_Serial(HardwareSerial*, int, int, int, int);
       void init(int);
       int read();
-      int magRead();
+      int magRead();//normal read
       void magRead1();//send read req
       int magRead2();//read after req
       void calibrate();

@@ -54,7 +54,7 @@ int CMPS10_Serial::magRead(){
     //Wait for Serial Buffer
     while(serialBus->available()<6){
       delayMicroseconds(1);    
-      Serial.println("Waiting");
+      //Serial.println("Waiting");
     }
 
     xMagHighByte = serialBus->read();//high x           
@@ -88,16 +88,17 @@ int CMPS10_Serial::magRead(){
 void CMPS10_Serial::magRead1(){
   if(millis()-lastMagReadTime>15){      
     serialBus->write(byte(0x21));
+    sentReq = true;
   }
   return;
 }
 
 int CMPS10_Serial::magRead2(){
-  if(millis()-lastMagReadTime>15){
+  if(sentReq){
     //Wait for Serial Buffer
     while(serialBus->available()<6){
       delayMicroseconds(1);    
-      Serial.println("Waiting");
+      //Serial.println("Waiting");
     }
 
     xMagHighByte = serialBus->read();//high x           

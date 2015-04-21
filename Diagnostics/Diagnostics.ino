@@ -70,11 +70,8 @@ void setup() {
 void loop() {
     VD_compound=0;
     //Start of Compass Align
-    compassValue=compass.magRead();
-    
+    compassValue=compass.magRead();    
     compassValue=compassValue-CA_Offset;
-    
-
     if(compassValue<0){
       compassValue=compassValue+360;
     }
