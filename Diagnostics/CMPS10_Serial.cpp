@@ -10,29 +10,34 @@ CMPS10_Serial::CMPS10_Serial(Stream * _bus): serialBus(_bus) {}
 
 CMPS10_Serial::CMPS10_Serial(Stream * _bus, int _xOffset, int _xScale, int _yOffset, int _yScale): serialBus(_bus), xOffset(_xOffset), xScale(_xScale), yOffset(_yOffset), yScale(_yScale) {}
 
+//Basic Tilt-compensated 2 byte read
 int CMPS10_Serial::read(){
-  serialBus->write(byte(0x02));
+  serialBus->write(byte(0x13));
+  
+  //Wait for Serial Buffer
+  while(serialBus->available()<2) delayMicroseconds(1); 
 
   highByte = serialBus->read();           
   lowByte = serialBus->read();
-  serialBus->read();
-  serialBus->read();
 
   bearing = int(int(highByte<<8)+lowByte)/10;
   return bearing;
 }
 
+//Raw Read to Bearing
 int CMPS10_Serial::magRead(){
   if(millis()-lastMagReadTime>15){      
     serialBus->write(byte(0x21));
+    
+    //Wait for Serial Buffer
     while(serialBus->available()<6) delayMicroseconds(1);    
 
-    xMagHighByte = serialBus->read();           
-    xMagLowByte = serialBus->read();
-    yMagHighByte = serialBus->read();           
-    yMagLowByte = serialBus->read();
-    serialBus->read();
-    serialBus->read();
+    xMagHighByte = serialBus->read();//high x           
+    xMagLowByte = serialBus->read();//low x
+    yMagHighByte = serialBus->read();//high y           
+    yMagLowByte = serialBus->read();//low y
+    serialBus->read();//high z
+    serialBus->read();//low z
     
     xMag = short(xMagHighByte<<8);
     xMag |= xMagLowByte;
@@ -55,12 +60,12 @@ int CMPS10_Serial::magRead(){
   return magBearing;
 }
 
+//
 int CMPS10_Serial::readMagAxis(char axis){
-  //serialBus->beginTransmission(I2C_Address);           
-  serialBus->write(byte(0x21));                              
-  //serialBus->endTransmission();
   
-  //serialBus->requestFrom(I2C_Address, 4);
+  serialBus->write(byte(0x21));
+  
+  //Wait for buffer to fill
   while(serialBus->available()<6) delayMicroseconds(1);
   xMagHighByte = serialBus->read();           
   xMagLowByte = serialBus->read();
@@ -79,17 +84,25 @@ int CMPS10_Serial::readMagAxis(char axis){
   else return 0;
 }
 
+//Calibration function
 void CMPS10_Serial::calibrate(){
   while(!Serial.available());
     byteRead=Serial.read();
     charRead = char(byteRead);
     Serial.println("Awaiting input");
     while(charRead!='a');
+    Serial.println("Initializing");
+    
+    //init caibration mode 0x31,0x45,0x5A,
+    delay(150);
+    serialBus->write(byte(0x31));
+    delay(150);
+    serialBus->write(byte(0x45));
+    delay(150);
+    serialBus->write(byte(0x5A));
+    delay(150);
+    
     Serial.println("Initialized");
-    //serialBus->beginTransmission(I2C_Address);
-    serialBus->write(byte(22));
-    serialBus->write(byte(0xF0));
-    //serialBus->endTransmission();
     
     while(!Serial.available());
     byteRead=Serial.read();
@@ -97,10 +110,7 @@ void CMPS10_Serial::calibrate(){
     Serial.println("Awaiting input");
     while(charRead!='a');
     Serial.println("0 degrees set");
-    //serialBus->beginTransmission(I2C_Address);
-    serialBus->write(byte(22));
-    serialBus->write(byte(0xF5));
-    //serialBus->endTransmission();
+    serialBus->write(byte(0x5E));
     
     while(!Serial.available());
     byteRead=Serial.read();
@@ -108,10 +118,7 @@ void CMPS10_Serial::calibrate(){
     Serial.println("Awaiting input");
     while(charRead!='a');
     Serial.println("90 degrees set");
-    //serialBus->beginTransmission(I2C_Address);
-    serialBus->write(byte(22));
-    serialBus->write(byte(0xF5));
-    //serialBus->endTransmission();
+    serialBus->write(byte(0x5E));
     
     while(!Serial.available());
     byteRead=Serial.read();
@@ -119,10 +126,7 @@ void CMPS10_Serial::calibrate(){
     Serial.println("Awaiting input");
     while(charRead!='a');
     Serial.println("180 degrees set");
-    //serialBus->beginTransmission(I2C_Address);
-    serialBus->write(byte(22));
-    serialBus->write(byte(0xF5));
-    //serialBus->endTransmission();
+    serialBus->write(byte(0x5E));
     
     while(!Serial.available());
     byteRead=Serial.read();
@@ -130,10 +134,7 @@ void CMPS10_Serial::calibrate(){
     Serial.println("Awaiting input");
     while(charRead!='a');
     Serial.println("270 degrees set");
-    //serialBus->beginTransmission(I2C_Address);
-    serialBus->write(byte(22));
-    serialBus->write(byte(0xF5));
-    //serialBus->endTransmission();
+    serialBus->write(byte(0x5E));
     Serial.println("Calibration Terminated"); 
 }
 
@@ -144,24 +145,15 @@ void CMPS10_Serial::factoryReset(){
       byteRead=Serial.read();
       charRead = char(byteRead);
     }
-    //serialBus->beginTransmission(I2C_Address);
-    serialBus->write(byte(22));
-    serialBus->write(byte(0x20));
-    //serialBus->endTransmission();
     
-    delay(100);
-    
-    //serialBus->beginTransmission(I2C_Address);
-    serialBus->write(byte(22));
-    serialBus->write(byte(0x2A));
-    //serialBus->endTransmission();
-    
-    delay(100);
-    
-    //serialBus->beginTransmission(I2C_Address);
-    serialBus->write(byte(22));
-    serialBus->write(byte(0x60));
-    //serialBus->endTransmission();
+    //send 0x6A,0x7C,0x81.
+    delay(150);
+    serialBus->write(byte(0x6A));
+    delay(150);
+    serialBus->write(byte(0x7C));
+    delay(150);
+    serialBus->write(byte(0x81));
+    delay(150);
     
     Serial.println("Factory Reset Successful");
 }

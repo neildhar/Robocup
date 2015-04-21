@@ -27,12 +27,18 @@ JM::compoundEye front_CE(&Wire);
 SRF10 right_US(&Wire1, 0xEA);
 SRF10 left_US(&Wire1, 0xEC);
 SRF10 back_US(&Wire, 0xEE);
-CMPS10_I2C compass(&Wire1, 0xC0, compassXOffset, compassXScale, compassYOffset, compassYScale);
-//JM::compassSensor compass(&Wire1);
+
 Motoren SEMotor(30,31,2);
 Motoren SWMotor(32,33,3,1);
 Motoren NWMotor(34,35,4,1);
 Motoren NEMotor(36,37,7); //5,6 are not used as there is interference from the internal clock
+
+
+//Compass Selection
+
+//CMPS10_I2C compass(&Wire1, 0xC0, compassXOffset, compassXScale, compassYOffset, compassYScale);
+CMPS10_Serial compass(&Serial1, compassXOffset, compassXScale, compassYOffset, compassYScale);
+//JM::compassSensor compass(&Wire1);
 
 //Declare Variables
 byte byteRead;
@@ -50,6 +56,7 @@ void setup() {
   Wire.begin();
   Wire1.begin();
   Serial.begin(9600);
+  Serial1.begin(9600);
   left_US.setGain(0x05);
   left_US.setRange(4);
   //right_US.setGain(0x05);
