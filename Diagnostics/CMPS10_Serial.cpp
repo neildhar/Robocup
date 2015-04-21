@@ -85,6 +85,49 @@ int CMPS10_Serial::magRead(){
   return magBearing;
 }
 
+void CMPS10_Serial::magRead1(){
+  if(millis()-lastMagReadTime>15){      
+    serialBus->write(byte(0x21));
+  }
+  return;
+}
+
+int CMPS10_Serial::magRead2(){
+  if(millis()-lastMagReadTime>15){
+    //Wait for Serial Buffer
+    while(serialBus->available()<6){
+      delayMicroseconds(1);    
+      Serial.println("Waiting");
+    }
+
+    xMagHighByte = serialBus->read();//high x           
+    xMagLowByte = serialBus->read();//low x
+    yMagHighByte = serialBus->read();//high y           
+    yMagLowByte = serialBus->read();//low y
+    serialBus->read();//high z
+    serialBus->read();//low z
+    
+    xMag = short(xMagHighByte<<8);
+    xMag |= xMagLowByte;
+    yMag = short(yMagHighByte<<8);
+    yMag |= yMagLowByte;
+    
+    realXMag = double(double(xMag+xOffset)/xScale);
+    realYMag = double(double(yMag+yOffset)/yScale);
+    
+    if(realYMag!=0){
+      magBearing = (atan2(realXMag,realYMag)*180.0)/3.141592654;
+    }
+    else if(realXMag>0) magBearing=0.0;
+    else if(realYMag<0) magBearing=180.0;
+    else magBearing = 1000;
+    if(magBearing < 0) magBearing+=360;
+    magBearing=360-magBearing;
+    lastMagReadTime=millis();
+  }
+  return magBearing;
+}
+
 //
 int CMPS10_Serial::readMagAxis(char axis){
   

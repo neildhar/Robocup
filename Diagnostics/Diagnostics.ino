@@ -57,6 +57,7 @@ void setup() {
   Wire1.begin();
   Serial.begin(9600);
   compass.init(38400); // init function begins serial as well
+  //Unfortunately increasing baud doesnt seem to negate ~20us read lag
   left_US.setGain(0x05);
   left_US.setRange(4);
   //right_US.setGain(0x05);

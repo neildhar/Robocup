@@ -27,6 +27,8 @@
       void init(int);
       int read();
       int magRead();
+      void magRead1();//send read req
+      int magRead2();//read after req
       void calibrate();
       void factoryReset();
       int readMagAxis(char);
