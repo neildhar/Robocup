@@ -92,7 +92,7 @@ void loop() {
     }
     
     else{
-      if(compassValue<180){
+      if(compassValue<180){//rotates anticlock //case compasslast = 30, compassvalue = 25; 
       CA_correction=(compassValue-CA_lastError)*CA_Kd+compassValue*CA_Kp;
       CA_lastError=compassValue;
       NEPower=SEPower=(CA_correction/8)+4;
@@ -111,7 +111,31 @@ void loop() {
         VD_compound++;
       }
     }
- 
+   
+    //PID compass v2
+    /*
+    if(compassValue<180){
+  	//rotate anticlockwise
+  	CA_adjusted = compassValue;
+  	CA_integral += CA_adjusted; // calculate integral
+  	CA_derivative = compassValue - CA_lastError;// calculate derivative
+  	CA_lastError = compassValue;
+  } else {
+  	//rotate clockwise
+  	CA_adjusted = compassValue-360;
+  	CA_integral += CA_integral; // calculate integral
+  	CA_derivative = compassValue - CA_lastError; // calculate derivative
+  	CA_lastError = compassValue;
+  }
+  
+  CA_adjusted = CA_Kp*CA_adjusted + CA_Ki*CA_integral + CA_Kd*CA_derivative;
+  
+  NEPower = SEPower = CA_adjusted;
+  NWPower = SWPower = CA_adjusted;
+  
+  VD_compound++
+  */
+   
   //xPos = left_US.read();
   //Serial.println(back_US.read());
   //yPos = xPos<rAimzone||xPos>lAimzone?back_US.read()+20:back_US.read();
