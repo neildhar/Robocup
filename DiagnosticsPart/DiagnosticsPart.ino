@@ -17,10 +17,10 @@
 #define lAimzone 45
 #define rAimzone 118
 #define MPS 1
-#define CA_Kd 0
+#define CA_Kd 5
 #define BA_Kp 0.71
 #define kAOG 180
-#define CA_Offset 182
+#define CA_Offset 188
 
 JM::compoundEye back_CE(&Wire1);
 JM::compoundEye front_CE(&Wire);
@@ -43,10 +43,10 @@ CMPS10_Serial compass(&Serial1, compassXOffset, compassXScale, compassYOffset, c
 //Declare Variables
 byte byteRead;
 char charRead;
-int compassValue, NEPower, SEPower, NWPower, SWPower, cspd, CA_correction, CA_lastError, VD_compound=0, CA_speed;
+int compassValue, NEPower, SEPower, NWPower, SWPower, cspd, CA_correction, CA_lastError, VD_compound=0, CA_speed, negNESE, negNWSW;;
 int trueMagVal=189, counter, BT_ballPos, BT_ballDist, BT_dirMod, BT_clockPort, BT_anticlockPort, BT_bulb;
 int xPos, yPos, BT_fIRValue, BT_bIRValue, VD_bearing;
-const double CA_Kp=double(200/180), BT_aimKp = 90/195;
+const double CA_Kp=double(400/180), BT_aimKp = 90/195;
 double VD_multiplier,VD_speed, VD_motorPowerScaler;
 bool leftZone, centreZone;
 
@@ -73,20 +73,44 @@ void setup() {
 void loop() {
     VD_compound=0;
     //Start of Compass Align
-    compassValue=compass.magRead();    
+    compassValue=compass.magRead();
+    Serial.print("C:");
+    Serial.print(compassValue);    
     compassValue=compassValue-CA_Offset;
     if(compassValue<0){
       compassValue=compassValue+360;
     }
-    Serial.print("C:");
-    Serial.print(compassValue);
+    
+    /* Basic Compass
     if(compassValue<=2||compassValue>=358) NEPower=SEPower=NWPower=SWPower=0;
     else if (compassValue>180) CA_speed = -(CA_Kp)*(360-compassValue);
     else CA_speed = (CA_Kp)*compassValue;
+    */
+    //PID Compass
+    if(compassValue<=2||compassValue>=358){
+         NEPower=SEPower=NWPower=SWPower=0;
+    }
     
-    NEPower = SEPower = CA_speed;
-    NWPower = SWPower = -CA_speed;
-    VD_compound++;
+    else{
+      if(compassValue<180){
+      CA_correction=(compassValue-CA_lastError)*CA_Kd+compassValue*CA_Kp;
+      CA_lastError=compassValue;
+      NEPower=SEPower=(CA_correction/8)+4;
+      NWPower=SWPower=(CA_correction/8*(-1))-4;
+      negNESE=-NEPower;
+      negNWSW=-NWPower;  
+      VD_compound++;    
+    }
+      else{
+        CA_correction=((360-compassValue)-CA_lastError)*CA_Kd+(360-compassValue)*CA_Kp;
+        CA_lastError=(360-compassValue);
+        NEPower=SEPower=((CA_correction/8)*(-1)-4);
+        NWPower=SWPower=(CA_correction/8)+4;
+        negNESE=-NEPower;
+        negNWSW=-NWPower;
+        VD_compound++;
+      }
+    }
  
   //xPos = left_US.read();
   //Serial.println(back_US.read());
