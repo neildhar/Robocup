@@ -43,7 +43,7 @@ CMPS10_Serial compass(&Serial1, compassXOffset, compassXScale, compassYOffset, c
 //Declare Variables
 byte byteRead;
 char charRead;
-int compassValue, NEPower, SEPower, NWPower, SWPower, cspd, CA_correction, CA_lastError, VD_compound=0, CA_speed, negNESE, negNWSW;;
+int compassValue, NEPower, SEPower, NWPower, SWPower, cspd, CA_correction, CA_lastError, VD_compound=0, CA_speed, negNESE, negNWSW;
 int trueMagVal=189, counter, BT_ballPos, BT_ballDist, BT_dirMod, BT_clockPort, BT_anticlockPort, BT_bulb;
 int xPos, yPos, BT_fIRValue, BT_bIRValue, VD_bearing;
 const double CA_Kp=double(400/180), BT_aimKp = 90/195;
@@ -131,7 +131,7 @@ void loop() {
   CA_adjusted = CA_Kp*CA_adjusted + CA_Ki*CA_integral + CA_Kd*CA_derivative;
   
   NEPower = SEPower = CA_adjusted;
-  NWPower = SWPower = CA_adjusted;
+  NWPower = SWPower = -CA_adjusted;
   
   VD_compound++
   */
@@ -226,7 +226,7 @@ void loop() {
   SWMotor.setPower(SWPower);
   NWMotor.setPower(NWPower);
   
-  
+  //output timestamp
   Serial.print("\t-\t");
   Serial.println(millis());
 }

@@ -10,6 +10,8 @@ CMPS10_Serial::CMPS10_Serial(HardwareSerial * _bus): serialBus(_bus) {}
 
 CMPS10_Serial::CMPS10_Serial(HardwareSerial * _bus, int _xOffset, int _xScale, int _yOffset, int _yScale): serialBus(_bus), xOffset(_xOffset), xScale(_xScale), yOffset(_yOffset), yScale(_yScale) {}
 
+//Initialize serial, CMPS10 over Serial and increase baudrate
+//though it doesnt actuallly help with the latency between requests
 void CMPS10_Serial::init(int baudRate){
   serialBus->begin(9600);
   delayMicroseconds(1000);
@@ -19,17 +21,6 @@ void CMPS10_Serial::init(int baudRate){
   serialBus->begin(baudRate);
   delayMicroseconds(1000);
   serialBus->read();
-  /*
-  Serial1.begin(9600);
-  //highbaud
-  //delayMicroseconds(2);
-  Serial1.write(0xA1);
-  //delayMicroseconds(2);
-  Serial1.end();
-  Serial1.begin(38400);
-  //delayMicroseconds(2);
-  Serial1.read();
-  */
 }
 
 //Basic Tilt-compensated 2 byte read
