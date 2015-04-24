@@ -17,10 +17,21 @@
 #define lAimzone 45
 #define rAimzone 118
 #define MPS 1
-#define CA_Kd 5
+
+//Kc ~ 1400
+//Kp ~ 0.9
+//Pc ~ 0.08
+
+#define CA_Offset 188
+#define CA_Kp 1000
+#define CA_Ki 0
+#define CA_Kd 1700
+#define CA_factor 1000
+
 #define BA_Kp 0.71
 #define kAOG 180
-#define CA_Offset 188
+
+#define VD_maxSpeed 200
 
 JM::compoundEye back_CE(&Wire1);
 JM::compoundEye front_CE(&Wire);
@@ -43,10 +54,11 @@ CMPS10_Serial compass(&Serial1, compassXOffset, compassXScale, compassYOffset, c
 //Declare Variables
 byte byteRead;
 char charRead;
-int compassValue, NEPower, SEPower, NWPower, SWPower, cspd, CA_correction, CA_lastError, VD_compound=0, CA_speed, negNESE, negNWSW;
+int compassValue, NEPower, SEPower, NWPower, SWPower;
+int CA_adjusted, CA_integral, CA_derivative, CA_lastRead;
 int trueMagVal=189, counter, BT_ballPos, BT_ballDist, BT_dirMod, BT_clockPort, BT_anticlockPort, BT_bulb;
-int xPos, yPos, BT_fIRValue, BT_bIRValue, VD_bearing;
-const double CA_Kp=double(400/180), BT_aimKp = 90/195;
+int xPos, yPos, BT_fIRValue, BT_bIRValue, VD_bearing, VD_compassSpeed;
+const double  BT_aimKp = 90/195;//CA_Kp=double(400/180),
 double VD_multiplier,VD_speed, VD_motorPowerScaler;
 bool leftZone, centreZone;
 
@@ -71,7 +83,6 @@ void setup() {
 }
 
 void loop() {
-    VD_compound=0;
     //Start of Compass Align
     compassValue=compass.magRead();
     Serial.print("C:");
@@ -80,6 +91,8 @@ void loop() {
     if(compassValue<0){
       compassValue=compassValue+360;
     }
+    Serial.print("\tA:");
+    Serial.print(compassValue);  
     
     /* Basic Compass
     if(compassValue<=2||compassValue>=358) NEPower=SEPower=NWPower=SWPower=0;
@@ -87,6 +100,7 @@ void loop() {
     else CA_speed = (CA_Kp)*compassValue;
     */
     //PID Compass
+    /*
     if(compassValue<=2||compassValue>=358){
          NEPower=SEPower=NWPower=SWPower=0;
     }
@@ -111,43 +125,52 @@ void loop() {
         VD_compound++;
       }
     }
-   
+    */
     //PID compass v2
-    /*
     if(compassValue<180){
-  	//rotate anticlockwise
-  	CA_adjusted = compassValue;
-  	CA_integral += CA_adjusted; // calculate integral
-  	CA_derivative = compassValue - CA_lastError;// calculate derivative
-  	CA_lastError = compassValue;
-  } else {
+    	//rotate anticlockwise
+    	CA_adjusted = compassValue;
+    	CA_integral += CA_adjusted; // calculate integral
+    	CA_derivative = CA_adjusted - CA_lastRead;// calculate derivative
+    	CA_lastRead = CA_adjusted;
+    } else {
   	//rotate clockwise
   	CA_adjusted = compassValue-360;
   	CA_integral += CA_integral; // calculate integral
-  	CA_derivative = compassValue - CA_lastError; // calculate derivative
-  	CA_lastError = compassValue;
-  }
+  	CA_derivative = CA_adjusted - CA_lastRead; // calculate derivative
+  	CA_lastRead = CA_adjusted;
+    }
+    CA_adjusted = (CA_Kp*CA_adjusted + CA_Ki*CA_integral + CA_Kd*CA_derivative)/ CA_factor;
+    if(CA_adjusted > 180){
+      CA_adjusted = 180;
+    } else if (CA_adjusted < -180){
+      CA_adjusted = -180;
+    }
+    if(compassValue<=3||compassValue>=357){
+      NEPower=SEPower=NWPower=SWPower=0;
+      VD_compassSpeed = 0;
+    } else {
+      NEPower = SEPower = CA_adjusted;
+      NWPower = SWPower = -CA_adjusted;
+      VD_compassSpeed = CA_adjusted;
+      if(VD_compassSpeed<0) VD_compassSpeed = -VD_compassSpeed;
+    }
+
   
-  CA_adjusted = CA_Kp*CA_adjusted + CA_Ki*CA_integral + CA_Kd*CA_derivative;
-  
-  NEPower = SEPower = CA_adjusted;
-  NWPower = SWPower = -CA_adjusted;
-  
-  VD_compound++
-  */
-   
   //xPos = left_US.read();
   //Serial.println(back_US.read());
   //yPos = xPos<rAimzone||xPos>lAimzone?back_US.read()+20:back_US.read();
-  Serial.print("\tFP:");
   BT_fIRValue=front_CE.highestValue(); //BT_fIRValue /=100;
+  
+  Serial.print("\tF:");
   Serial.print(BT_fIRValue);
-  Serial.print("\tBP:");
   BT_bIRValue=back_CE.highestValue(); //BT_bIRValue /=100;
+  
+  Serial.print("\tB:");
   Serial.print(BT_bIRValue);
   if(BT_fIRValue>ambientIR||BT_bIRValue>ambientIR){ //Check if ball is on field
     //Start of Ball Tracking
-    VD_speed=0.6;
+    VD_speed=200;
     if(BT_fIRValue>BT_bIRValue){
       BT_bulb = front_CE.highestBulb();
       BT_ballDist = BT_fIRValue; 
@@ -172,6 +195,9 @@ void loop() {
     if ( BT_ballPos<=180&&BT_ballPos>=15 ) VD_bearing=BT_ballPos+(BT_dirMod*BT_ballDist)/kAOG;
     else if ( BT_ballPos<=345&&BT_ballPos>180 ) VD_bearing=BT_ballPos-(BT_dirMod*BT_ballDist)/kAOG;
     else VD_bearing=BT_ballPos;
+    VD_bearing=BT_ballPos;
+    Serial.print("\tPos:");
+    Serial.print(VD_bearing);
     
     if ( (BT_ballPos>345||BT_ballPos<15) && BT_ballDist==145){
       /*if (xPos<lAimzone) VD_bearing=yPos*BT_aimKp;
@@ -179,9 +205,6 @@ void loop() {
       else VD_bearing=0;*/
       VD_bearing=0;
     }
-    
-    Serial.print("\tBP:");
-    Serial.print(BT_ballPos);
   }
   
   else{
@@ -213,19 +236,34 @@ void loop() {
     //}
     
   }
+  
+  if(VD_speed + VD_compassSpeed > 200){
+    VD_speed -= VD_compassSpeed;
+  }
+  
+  Serial.print("\tSpd:");
+  Serial.print(VD_speed);
+  
   //Compute vector
-  VD_compound++;
-  NEPower=((NEPower+(VectorDynamics[VD_bearing][1]*VD_speed))/VD_compound);
-  SEPower=((SEPower+(VectorDynamics[VD_bearing][0]*VD_speed))/VD_compound);
-  SWPower=((SWPower+(VectorDynamics[VD_bearing][1]*VD_speed))/VD_compound);
-  NWPower=((NWPower+(VectorDynamics[VD_bearing][0]*VD_speed))/VD_compound);
+  NEPower=NEPower+(VectorDynamics[VD_bearing][1]*VD_speed)/255;
+  SEPower=SEPower+(VectorDynamics[VD_bearing][0]*VD_speed)/255;
+  SWPower=SWPower+(VectorDynamics[VD_bearing][1]*VD_speed)/255;
+  NWPower=NWPower+(VectorDynamics[VD_bearing][0]*VD_speed)/255;
+  
+  Serial.print("\tNE:");
+  Serial.print(NEPower);
+  Serial.print("\tNW:");
+  Serial.print(NWPower);
+  Serial.print("\tSE:");
+  Serial.print(SEPower);
+  Serial.print("\tSW:");
+  Serial.print(SWPower);
   
   //Set motor powers
   NEMotor.setPower(NEPower);
   SEMotor.setPower(SEPower);
   SWMotor.setPower(SWPower);
   NWMotor.setPower(NWPower);
-  
   //output timestamp
   Serial.print("\t-\t");
   Serial.println(millis());
