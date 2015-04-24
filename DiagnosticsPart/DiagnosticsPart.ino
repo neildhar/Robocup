@@ -10,11 +10,11 @@
 #define compassYScale 355
 #define compassXOffset -396
 #define compassXScale 375
-#define ambientIR 15
+#define ambientIR 20
 #define BA_middle 50 
 #define BA_back 50
 #define backOffset 20
-#define lAimzone 45
+#define lAimzone 45 
 #define rAimzone 118
 #define MPS 1
 
@@ -24,9 +24,9 @@
 // 1000/0/1700 usually
 
 #define CA_Offset 188
-#define CA_Kp 2000
+#define CA_Kp 400
 #define CA_Ki 0
-#define CA_Kd 5000 
+#define CA_Kd 1000
 #define CA_factor 1000
 
 #define BA_Kp 0.71
@@ -232,31 +232,25 @@ void loop() {
     }
     else{*/
     VD_bearing=0;
-    VD_speed=0.0;
+    VD_speed=0;
     //}
     
   }
-  VD_speed=200;
+  /*
   if(VD_speed + VD_compassSpeed > 200){
     VD_speed -= VD_compassSpeed;
   }
-  
+  */
   Serial.print("\tSpd:");
   Serial.print(VD_speed);
   
-  VD_bearing = 315;
+  //VD_bearing = 315;
   
   //Compute vector
-  /*
   NEPower=NEPower+(VectorDynamics[VD_bearing][1]*VD_speed)/255;
   SEPower=SEPower+(VectorDynamics[VD_bearing][0]*VD_speed)/255;
   SWPower=SWPower+(VectorDynamics[VD_bearing][1]*VD_speed)/255;
   NWPower=NWPower+(VectorDynamics[VD_bearing][0]*VD_speed)/255;
-  */
-  NEPower=NEPower+VD_speed;
-  SEPower=SEPower+VD_speed;
-  SWPower=SWPower+VD_speed;
-  NWPower=NWPower+VD_speed;
   
   Serial.print("\tNE:");
   Serial.print(NEPower);
