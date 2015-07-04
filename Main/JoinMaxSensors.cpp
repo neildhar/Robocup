@@ -42,12 +42,10 @@ void compoundEye::initialize(){
   i2cBus->write(14);
   i2cBus->endTransmission();
   i2cBus->requestFrom(I2C_Address,1);
+  while(i2cBus->available()) i2cBus->read();
 }
 int compoundEye::highestValue(){
-  i2cBus->beginTransmission(I2C_Address);
-  i2cBus->write(14);
-  i2cBus->endTransmission();
-  i2cBus->requestFrom(I2C_Address,1);
+  this->initialize();
   i2cBus->beginTransmission(I2C_Address);
   i2cBus->write(9);
   i2cBus->endTransmission();
@@ -56,10 +54,7 @@ int compoundEye::highestValue(){
   return (int) i2cBus->read();
 }
 int compoundEye::highestBulb(){
-  i2cBus->beginTransmission(I2C_Address);
-  i2cBus->write(14);
-  i2cBus->endTransmission();
-  i2cBus->requestFrom(I2C_Address,1);
+  this->initialize();
   i2cBus->beginTransmission(I2C_Address);
   i2cBus->write(8);
   i2cBus->endTransmission();
@@ -69,10 +64,7 @@ int compoundEye::highestBulb(){
 }
 int compoundEye::readBulb(int bulb){
   int command = bulb<=4?5-bulb:12-bulb; 
-  i2cBus->beginTransmission(I2C_Address);
-  i2cBus->write(14);
-  i2cBus->endTransmission();
-  i2cBus->requestFrom(I2C_Address,1);
+  this->initialize();
   i2cBus->beginTransmission(I2C_Address);
   i2cBus->write(command);
   i2cBus->endTransmission();

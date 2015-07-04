@@ -19,10 +19,12 @@
       short temp;
     public:
       SRF10(TwoWire*, byte);
+      int asyncRead();
       int read();
       int setAddress(byte);
       void setGain(int);
       void setRange(double);
+      void startRanging(byte);
   };
 
 #endif

@@ -92,8 +92,8 @@ void loop() {
       }
     }
  
-  xPos = left_US.read();
-  yPos = xPos<rAimzone||xPos>lAimzone?back_US.read()+20:back_US.read();
+  xPos = left_US.asyncRead();
+  yPos = xPos<rAimzone||xPos>lAimzone?back_US.asyncRead()+20:back_US.asyncRead();
   fIRValue=front_CE.highestValue();
   bIRValue=back_CE.highestValue();
 
