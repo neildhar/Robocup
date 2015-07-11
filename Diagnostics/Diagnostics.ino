@@ -11,7 +11,7 @@
 #define compassXOffset -396
 #define compassXScale 375
 #define ambientIR 8
-#define BA_middle 50 
+#define BA_middle 50
 #define BA_back 50
 #define backOffset 20
 #define lAimzone 45
@@ -75,7 +75,7 @@ void loop() {
     if(compassValue<0){
       compassValue=compassValue+360;
     }
-    Serial.println(compassValue);
+    //Serial.println(compassValue);
     if(compassValue<=2||compassValue>=358) NEPower=SEPower=NWPower=SWPower=0;
     else if (compassValue>180) CA_speed = -(CA_Kp)*(360-compassValue);
     else CA_speed = (CA_Kp)*compassValue;
@@ -84,10 +84,11 @@ void loop() {
     VD_compound++;
  
   //xPos = left_US.read();
-  back_US.read();
+  //Serial.println(back_US.asyncRead());
   //yPos = xPos<rAimzone||xPos>lAimzone?back_US.read()+20:back_US.read();
   BT_fIRValue=front_CE.highestValue();
-  BT_bIRValue=0;//back_CE.highestValue();
+  //Serial.println(BT_bIRValue=back_CE.highestValue());
+  
 
   if(BT_fIRValue>ambientIR||BT_bIRValue>ambientIR){ //Check if ball is on field
     //Start of Ball Tracking

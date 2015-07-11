@@ -13,25 +13,34 @@ SRF10::SRF10(TwoWire * _bus, byte Addr): i2cBus(_bus) {
 }
 
 int SRF10::read(){
-  if(millis()-lastRangeTime>USRange){
-  	i2cBus->beginTransmission(I2C_Address);
+	i2cBus->beginTransmission(I2C_Address);
   	i2cBus->write(byte(0x02));
   	i2cBus->endTransmission();
 	i2cBus->requestFrom(I2C_Address, 2);
 	while(i2cBus->available() < 2); 
   	byte high = i2cBus->read();
   	byte low = i2cBus->read();
-        temp=(high << 8) + low;
+    temp=(high << 8) + low;
   	range = temp>0?temp:range;
+  	return range;
+}
+
+int SRF10::asyncRead(){
+  if(millis()-lastRangeTime>USRange){
+  	this->read();
      
+	this->startRanging(0x51);
+	lastRangeTime=millis();
+  }
+  return range;
+}
+
+void SRF10::startRanging(byte units){
   	//initiate a new ranging
 	i2cBus->beginTransmission(I2C_Address);
 	i2cBus->write(byte(0x00));
-	i2cBus->write(byte(0x51));
+	i2cBus->write(byte(units));
 	i2cBus->endTransmission();
-        lastRangeTime=millis();
-  }
-  return range;
 }
 
 int SRF10::setAddress(byte newAddr){
@@ -78,12 +87,12 @@ void SRF10::setGain(int gain){
 }
 
 void SRF10::setRange(double newRange){
-  int rangeNo = (int)((double)((newRange-0.043)/0.043));
+  int rangeNo = (int)((double)((newRange-0.043)/0.043)+0.5);
   
   i2cBus->beginTransmission(I2C_Address);
   i2cBus->write(byte(0x02));
   i2cBus->write(rangeNo);
   i2cBus->endTransmission();
-  USRange = (double)(0.3*rangeNo);
+  USRange = (double)(0.28*rangeNo);
 }
 
