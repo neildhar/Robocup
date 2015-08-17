@@ -25,11 +25,11 @@ int SRF10::read(){
   	return range;
 }
 
-int SRF10::asyncRead(){
+int SRF10::asyncRead(byte units){
   if(millis()-lastRangeTime>USRange){
   	this->read();
      
-	this->startRanging(0x51);
+	this->startRanging(units);
 	lastRangeTime=millis();
   }
   return range;

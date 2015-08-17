@@ -84,7 +84,7 @@ void loop() {
     VD_compound++;
  
   //xPos = left_US.read();
-  //Serial.println(back_US.asyncRead());
+  //Serial.println(back_US.asyncRead(0x51));
   //yPos = xPos<rAimzone||xPos>lAimzone?back_US.read()+20:back_US.read();
   BT_fIRValue=front_CE.highestValue();
   //Serial.println(BT_bIRValue=back_CE.highestValue());

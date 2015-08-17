@@ -140,7 +140,7 @@ void CMPS10_I2C::calibrate(){
     i2cBus->write(byte(22));
     i2cBus->write(byte(0xF5));
     i2cBus->endTransmission();
-    Serial.println("Calibration Terminated"); 
+    Serial.println("Calibration Complete"); 
 }
 
 void CMPS10_I2C::factoryReset(){

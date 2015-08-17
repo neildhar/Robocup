@@ -19,17 +19,6 @@ void CMPS10_Serial::init(int baudRate){
   serialBus->begin(baudRate);
   delayMicroseconds(1000);
   serialBus->read();
-  /*
-  Serial1.begin(9600);
-  //highbaud
-  //delayMicroseconds(2);
-  Serial1.write(0xA1);
-  //delayMicroseconds(2);
-  Serial1.end();
-  Serial1.begin(38400);
-  //delayMicroseconds(2);
-  Serial1.read();
-  */
 }
 
 //Basic Tilt-compensated 2 byte read
@@ -54,7 +43,6 @@ int CMPS10_Serial::magRead(){
     //Wait for Serial Buffer
     while(serialBus->available()<6){
       delayMicroseconds(1);    
-      //Serial.println("Waiting");
     }
 
     xMagHighByte = serialBus->read();//high x           
@@ -158,7 +146,7 @@ void CMPS10_Serial::calibrate(){
   while(!Serial.available());
     byteRead=Serial.read();
     charRead = char(byteRead);
-    Serial.println("Awaiting input");
+    Serial.println("Please enter 'a' to start calibration");
     while(charRead!='a');
     Serial.println("Initializing");
     
@@ -204,7 +192,7 @@ void CMPS10_Serial::calibrate(){
     while(charRead!='a');
     Serial.println("270 degrees set");
     serialBus->write(byte(0x5E));
-    Serial.println("Calibration Terminated"); 
+    Serial.println("Calibration Complete"); 
 }
 
 void CMPS10_Serial::factoryReset(){
