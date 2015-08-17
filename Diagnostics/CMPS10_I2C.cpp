@@ -86,55 +86,64 @@ int CMPS10_I2C::readMagAxis(char axis){
 }
 
 void CMPS10_I2C::calibrate(){
-  while(!Serial.available());
-    byteRead=Serial.read();
-    charRead = char(byteRead);
-    Serial.println("Awaiting input");
-    while(charRead!='a');
-    Serial.println("Initialized");
+    Serial.println("Please enter the letter 'a' to start the calibration");
+    while(!Serial.available());
+    while(charRead!='a'){
+      delay(1);
+      byteRead=Serial.read();
+      charRead = char(byteRead);
+    }
     i2cBus->beginTransmission(I2C_Address);
     i2cBus->write(byte(22));
     i2cBus->write(byte(0xF0));
     i2cBus->endTransmission();
     
+    Serial.println("Please enter the letter 'a' to calibrate 0 degrees");
     while(!Serial.available());
-    byteRead=Serial.read();
-    charRead = char(byteRead);
-    Serial.println("Awaiting input");
-    while(charRead!='a');
+    while(charRead!='a'){
+      delay(1);
+      byteRead=Serial.read();
+      charRead = char(byteRead);
+    }
     Serial.println("0 degrees set");
     i2cBus->beginTransmission(I2C_Address);
     i2cBus->write(byte(22));
     i2cBus->write(byte(0xF5));
     i2cBus->endTransmission();
     
+    Serial.println("Please enter the letter 'a' to calibrate 90 degrees");
     while(!Serial.available());
-    byteRead=Serial.read();
-    charRead = char(byteRead);
-    Serial.println("Awaiting input");
-    while(charRead!='a');
+    while(charRead!='a'){
+      delay(1);
+      byteRead=Serial.read();
+      charRead = char(byteRead);
+    }
     Serial.println("90 degrees set");
     i2cBus->beginTransmission(I2C_Address);
     i2cBus->write(byte(22));
     i2cBus->write(byte(0xF5));
     i2cBus->endTransmission();
     
+    Serial.println("Please enter the letter 'a' to calibrate 180 degrees");
     while(!Serial.available());
-    byteRead=Serial.read();
-    charRead = char(byteRead);
-    Serial.println("Awaiting input");
-    while(charRead!='a');
+    while(charRead!='a'){
+      delay(1);
+      byteRead=Serial.read();
+      charRead = char(byteRead);
+    }
     Serial.println("180 degrees set");
     i2cBus->beginTransmission(I2C_Address);
     i2cBus->write(byte(22));
     i2cBus->write(byte(0xF5));
     i2cBus->endTransmission();
     
+    Serial.println("Please enter the letter 'a' to calibrate 270 degrees");
     while(!Serial.available());
-    byteRead=Serial.read();
-    charRead = char(byteRead);
-    Serial.println("Awaiting input");
-    while(charRead!='a');
+    while(charRead!='a'){
+      delay(1);
+      byteRead=Serial.read();
+      charRead = char(byteRead);
+    }
     Serial.println("270 degrees set");
     i2cBus->beginTransmission(I2C_Address);
     i2cBus->write(byte(22));
@@ -144,6 +153,7 @@ void CMPS10_I2C::calibrate(){
 }
 
 void CMPS10_I2C::factoryReset(){
+    Serial.println("Please enter the letter 'a' to start the factory reset");
     while(!Serial.available());
     while(charRead!='a'){
       delay(1);

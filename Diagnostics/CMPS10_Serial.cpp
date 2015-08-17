@@ -143,14 +143,15 @@ int CMPS10_Serial::readMagAxis(char axis){
 
 //Calibration function
 void CMPS10_Serial::calibrate(){
-  while(!Serial.available());
-    byteRead=Serial.read();
-    charRead = char(byteRead);
-    Serial.println("Please enter 'a' to start calibration");
-    while(charRead!='a');
-    Serial.println("Initializing");
+  Serial.println("Please enter the letter 'a' to start the calibration");
+    while(!Serial.available());
+    while(charRead!='a'){
+      delay(1);
+      byteRead=Serial.read();
+      charRead = char(byteRead);
+    }
     
-    //init caibration mode 0x31,0x45,0x5A,
+    //init calibration mode 0x31,0x45,0x5A,
     delay(150);
     serialBus->write(byte(0x31));
     delay(150);
@@ -161,41 +162,50 @@ void CMPS10_Serial::calibrate(){
     
     Serial.println("Initialized");
     
+    Serial.println("Please enter the letter 'a' to calibrate 0 degrees");
     while(!Serial.available());
-    byteRead=Serial.read();
-    charRead = char(byteRead);
-    Serial.println("Awaiting input");
-    while(charRead!='a');
+    while(charRead!='a'){
+      delay(1);
+      byteRead=Serial.read();
+      charRead = char(byteRead);
+    }
     Serial.println("0 degrees set");
     serialBus->write(byte(0x5E));
     
+    Serial.println("Please enter the letter 'a' to calibrate 90 degrees");
     while(!Serial.available());
-    byteRead=Serial.read();
-    charRead = char(byteRead);
-    Serial.println("Awaiting input");
-    while(charRead!='a');
+    while(charRead!='a'){
+      delay(1);
+      byteRead=Serial.read();
+      charRead = char(byteRead);
+    }
     Serial.println("90 degrees set");
     serialBus->write(byte(0x5E));
     
+    Serial.println("Please enter the letter 'a' to calibrate 180 degrees");
     while(!Serial.available());
-    byteRead=Serial.read();
-    charRead = char(byteRead);
-    Serial.println("Awaiting input");
-    while(charRead!='a');
+    while(charRead!='a'){
+      delay(1);
+      byteRead=Serial.read();
+      charRead = char(byteRead);
+    }
     Serial.println("180 degrees set");
     serialBus->write(byte(0x5E));
     
+    Serial.println("Please enter the letter 'a' to calibrate 270 degrees");
     while(!Serial.available());
-    byteRead=Serial.read();
-    charRead = char(byteRead);
-    Serial.println("Awaiting input");
-    while(charRead!='a');
+    while(charRead!='a'){
+      delay(1);
+      byteRead=Serial.read();
+      charRead = char(byteRead);
+    }
     Serial.println("270 degrees set");
     serialBus->write(byte(0x5E));
     Serial.println("Calibration Complete"); 
 }
 
 void CMPS10_Serial::factoryReset(){
+    Serial.println("Please enter the letter 'a' to start the factory reset");
     while(!Serial.available());
     while(charRead!='a'){
       delay(1);

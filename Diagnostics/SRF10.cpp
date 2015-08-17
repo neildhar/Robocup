@@ -20,7 +20,7 @@ int SRF10::read(){
 	while(i2cBus->available() < 2); 
   	byte high = i2cBus->read();
   	byte low = i2cBus->read();
-    temp=(high << 8) + low;
+        temp=(high << 8) + low;
   	range = temp>0?temp:range;
   	return range;
 }
