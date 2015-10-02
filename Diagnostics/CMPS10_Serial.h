@@ -25,7 +25,7 @@
     public:
       CMPS10_Serial(HardwareSerial*);
       CMPS10_Serial(HardwareSerial*, int, int, int, int);
-      void init(int);
+      void setBaud(int);
       int read();
       int magRead();//normal read
       void magRead1();//send read req

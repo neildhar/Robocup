@@ -10,9 +10,7 @@ CMPS10_Serial::CMPS10_Serial(HardwareSerial * _bus): serialBus(_bus) {}
 
 CMPS10_Serial::CMPS10_Serial(HardwareSerial * _bus, int _xOffset, int _xScale, int _yOffset, int _yScale): serialBus(_bus), xOffset(_xOffset), xScale(_xScale), yOffset(_yOffset), yScale(_yScale) {}
 
-void CMPS10_Serial::init(int baudRate){
-  serialBus->begin(9600);
-  delayMicroseconds(1000);
+void CMPS10_Serial::setBaud(int baudRate){
   serialBus->write(0xA1);
   delayMicroseconds(1000);
   serialBus->end();
