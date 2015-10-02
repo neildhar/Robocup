@@ -1,5 +1,6 @@
 /*
-  CMPS10_Serial.cpp - Library for using CMPS10 Compass with Arduino over Serial
+  CMPS10_Serial.cpp - Library for using CMPS10 compass with Arduino over Serial
+  Created by Senor Neil Dhar, April 11, 2014.
 */
 
 #ifndef CMPS10_Serial_h

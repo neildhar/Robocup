@@ -1,5 +1,6 @@
 /*
-  CMPS10_I2C.h - Library for using CMPS10 Compass with Arduino over I2C
+  CMPS10_I2C.cpp - Library for using CMPS10 compass with Arduino over I2C
+  Created by Senor Neil Dhar, April 11, 2014.
 */
 
 #ifndef CMPS10_I2C_h

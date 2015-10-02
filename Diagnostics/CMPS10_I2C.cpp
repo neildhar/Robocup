@@ -1,5 +1,5 @@
 /*
-  SRF10.cpp - Library for using SRF10 Rangefinders with Arduino
+  CMPS10_I2C.cpp - Library for using CMPS10 compass with Arduino over I2C
   Created by Senor Neil Dhar, April 11, 2014.
 */
 #include <Arduino.h>
